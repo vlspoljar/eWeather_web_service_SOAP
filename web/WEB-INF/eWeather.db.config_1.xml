@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>eWeather configuration</comment>
+<entry key="server.database">jdbc:mysql://localhost:3306/</entry>
+<entry key="admin.username">eweather_admin</entry>
+<entry key="admin.password">admin_eweather</entry>
+<entry key="admin.database">eweather_bp_1</entry>
+<entry key="user.username">eweather_user</entry>
+<entry key="user.password">user_eweather</entry>
+<entry key="user.database">eweather_bp_1</entry>
+<entry key="driver.database.odbc">sun.jdbc.odbc.JdbcOdbcDriver</entry>
+<entry key="driver.database.mysql">com.mysql.jdbc.Driver</entry>
+<entry key="driver.database.derby">org.apache.derby.jdbc.ClientDriver</entry>
+<entry key="weatherBug.cKey">xLe1xGFXfID5UiEiVGFaLRYDH0AEPDt2</entry>
+<entry key="weatherBug.sKey">bUgkjOP5awSV7X24</entry>
+<entry key="mt.interval">3600</entry>
+</properties>

@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <f:view contentType="text/html">
+        <h:head>
+            <f:facet name="first">
+                <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+                <title>PrimeFaces</title>
+            </f:facet>
+            <style>
+                #map-canvas {
+                    width: 80%;
+                    height: 100%;
+                    margin: 0px;
+                    padding: 0px;
+                    float: left;
+                }
+            </style>
+            <script src="https://maps.googleapis.com/maps/api/js"></script>
+            <script>
+                var geocoder;
+                var map;
+                var marker;
+                var infowindow = new google.maps.InfoWindow();
+                
+                function initialize() {
+                    geocoder = new google.maps.Geocoder();
+                    var latlng = new google.maps.LatLng(46.305746, 16.336607);
+                    var mapOptions = {
+                        zoom: 6,
+                        center: latlng
+                    };
+                    map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+                    google.maps.event.addListener(map, 'click', addAddress);
+                }
+
+                function codeAddress() {
+                    var address = document.getElementById("address").value;
+                    geocoder.geocode({'address': address}, function (results, status) {
+                        if (status === google.maps.GeocoderStatus.OK) {
+                            map.setCenter(results[0].geometry.location);
+                            marker = new google.maps.Marker({
+                                map: map,
+                                position: results[0].geometry.location
+                            });
+                            document.getElementById('latitude').value = results[0].geometry.location.lat();
+                            document.getElementById('longitude').value = results[0].geometry.location.lng();
+                            infowindow.setContent(address + "<br/>" + results[0].geometry.location.lat() + ', ' + results[0].geometry.location.lng());
+                                infowindow.open(map, marker);
+                            }
+                        });
+
+                    }
+
+                function codeLatLng() {
+                    var lat = parseFloat(document.getElementById('latitude').value);
+                    var lng = parseFloat(document.getElementById('longitude').value);
+                    var latlng = new google.maps.LatLng(lat, lng);
+                    geocoder.geocode({'latLng': latlng}, function (results, status) {
+                        if (status === google.maps.GeocoderStatus.OK) {
+                            if (results[1]) {
+                                map.setZoom(11);
+                                marker = new google.maps.Marker({
+                                    position: latlng,
+                                    map: map
+                                });
+                                document.getElementById('address').value = results[1].formatted_address;
+                                infowindow.setContent(results[1].formatted_address + "<br/>" + lat + ", " + lng);
+                                infowindow.open(map, marker);
+                            }
+                        }
+                    });
+                }
+                
+                function addAddress(event) {
+                    document.getElementById('latitude').value = event.latLng.lat();
+                    document.getElementById('longitude').value = event.latLng.lng();
+                    var lat = parseFloat(document.getElementById('latitude').value);
+                    var lng = parseFloat(document.getElementById('longitude').value);
+                    var latlng = new google.maps.LatLng(lat, lng);
+                    geocoder.geocode({'latLng': latlng}, function (results, status) {
+                        if (status === google.maps.GeocoderStatus.OK) {
+                            if (results[1]) {
+                                map.setZoom(8);
+                                marker = new google.maps.Marker({
+                                    position: latlng,
+                                    map: map
+                                });
+                                document.getElementById('address').value = results[1].formatted_address;
+                                infowindow.setContent(results[1].formatted_address + "<br/>" + lat + ", " + lng);
+                                infowindow.open(map, marker);
+                            }
+                        }
+                    });
+                }
+
+                google.maps.event.addDomListener(window, 'load', initialize);
+            </script>
+
+        </h:head>
+
+        <h:body>
+
+            <p:layout fullPage="true">
+
+                <p:layoutUnit position="north" size="100" resizable="true" closable="true" collapsible="true">
+                    Header
+                </p:layoutUnit>
+
+                <p:layoutUnit position="south" size="100" closable="true" collapsible="true">
+                    Footer
+                </p:layoutUnit>
+
+                <p:layoutUnit position="west" size="175" header="Left" collapsible="true">
+                    <p:menu>
+                        <p:submenu label="Resources">
+                            <p:menuitem value="Demo" url="http://www.primefaces.org/showcase-labs/ui/home.jsf" />
+                            <p:menuitem value="Documentation" url="http://www.primefaces.org/documentation.html" />
+                            <p:menuitem value="Forum" url="http://forum.primefaces.org/" />
+                            <p:menuitem value="Themes" url="http://www.primefaces.org/themes.html" />
+
+                        </p:submenu>
+
+                    </p:menu>
+                </p:layoutUnit>
+
+                <p:layoutUnit position="center">
+
+                    <div id="map-canvas"></div>
+
+                    <h:form prependId="false" style="float: right; background: #85b2cb;">
+                        <h:panelGrid id="grid">
+                            <h:outputLabel for="address" value="Address:" style="font-weight:bold"/>                    
+                            <p:inputText id="address" value="#{newAddress.address}" label="Address:" onchange="codeAddress()"/>
+
+                            <h:outputLabel for="latitude" value="Latitude:" style="font-weight:bold"/>
+                            <p:inputText id="latitude" value="#{newAddress.latitude}" label="Latitude:" onchange="codeLatLng()"/>
+
+                            <h:outputLabel for="longitude" value="Longitude:" style="font-weight:bold"/>
+                            <p:inputText id="longitude" value="#{newAddress.longitude}" label="Longitude:" onchange="codeLatLng()"/>
+                        </h:panelGrid>
+                        <p:commandButton value="Add address" update="grid" validateClient="true" style="margin-right:10px" action="#{newAddress.saveAddress()}"/>
+                    </h:form>
+
+                </p:layoutUnit>
+
+            </p:layout>
+
+
+        </h:body>
+
+    </f:view>
+</html>
+
